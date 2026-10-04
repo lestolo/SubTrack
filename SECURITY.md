@@ -7,7 +7,7 @@ Only the latest release (the `main` branch) receives security fixes.
 ## Reporting a vulnerability
 
 Please report vulnerabilities **privately** through GitHub's
-[private vulnerability reporting](https://github.com/lestolo/subscription-tracker/security/advisories/new)
+[private vulnerability reporting](https://github.com/lestolo/SubTrack/security/advisories/new)
 (*Security* tab → *Report a vulnerability*). Don't open a public issue.
 
 Please include:

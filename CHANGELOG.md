@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2026-10-04
+
+### Changed
+
+- The repository was renamed from `subscription-tracker` to `SubTrack`: links in the app (Settings → Source code), READMEs and community files now point to the new address.
+
 ## [1.1.0] - 2026-10-04
 
 ### Added

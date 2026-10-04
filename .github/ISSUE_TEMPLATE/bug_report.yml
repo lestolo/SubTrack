@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Thanks for reporting! ⚠️ Please **remove any personal data** from text, screenshots and files.
-        For security vulnerabilities, use [private reporting](https://github.com/lestolo/subscription-tracker/security/advisories/new) instead.
+        For security vulnerabilities, use [private reporting](https://github.com/lestolo/SubTrack/security/advisories/new) instead.
   - type: textarea
     id: what
     attributes:

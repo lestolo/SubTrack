@@ -6,7 +6,7 @@
 
 **Track all your subscriptions in one place: private, offline-first, installable.**
 
-[![CI](https://github.com/lestolo/subscription-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/lestolo/subscription-tracker/actions/workflows/ci.yml)
+[![CI](https://github.com/lestolo/SubTrack/actions/workflows/ci.yml/badge.svg)](https://github.com/lestolo/SubTrack/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-6D5EF5.svg)](LICENSE)
 ![PWA](https://img.shields.io/badge/PWA-ready-8B5CF6)
 ![No dependencies](https://img.shields.io/badge/dependencies-0-1F9D55)
@@ -58,8 +58,8 @@
 Requirements: any static web server. For local development: [Node.js](https://nodejs.org) ≥ 20 (optional, only for the dev server and the tests).
 
 ```bash
-git clone https://github.com/lestolo/subscription-tracker.git
-cd subscription-tracker
+git clone https://github.com/lestolo/SubTrack.git
+cd SubTrack
 npm start            # serves the app on http://localhost:8080
 ```
 
@@ -73,7 +73,7 @@ The app is a folder of static files with no build step and no environment variab
 
 ### Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flestolo%2Fsubscription-tracker)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flestolo%2FSubTrack)
 
 1. Import the repository in Vercel.
 2. Framework preset: **Other**. Build command: *none*. Output directory: `.` (root).
@@ -173,7 +173,7 @@ npm start            # local dev server
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and our [Code of Conduct](CODE_OF_CONDUCT.md). Report bugs and ideas through [GitHub Issues](https://github.com/lestolo/subscription-tracker/issues).
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and our [Code of Conduct](CODE_OF_CONDUCT.md). Report bugs and ideas through [GitHub Issues](https://github.com/lestolo/SubTrack/issues).
 
 ## Credits and trademarks
 

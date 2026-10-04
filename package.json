@@ -1,5 +1,5 @@
 {
-  "name": "subscription-tracker",
+  "name": "subtrack",
   "version": "1.0.0",
   "private": true,
   "description": "Offline-first PWA to track your subscriptions. Data stays on your device (IndexedDB).",
