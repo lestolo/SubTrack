@@ -114,12 +114,18 @@
     const now = Date.now();
     const id = typeof input.id === 'string' && /^[\w-]{8,64}$/.test(input.id)
       ? input.id : uuid();
+    const active = input.active !== false;
+    const priceHistory = sanitizePriceHistory(input.priceHistory, startDate, price);
 
     return {
       id,
       catalogId,
       name,
-      price,
+      // The latest entry of the price history is the current price.
+      price: priceHistory[priceHistory.length - 1].price,
+      priceHistory,
+      charges: sanitizeCharges(input.charges),
+      pausedAt: !active && schedule.parseISO(input.pausedAt) ? input.pausedAt : null,
       currency,
       freq,
       startDate,
@@ -127,10 +133,43 @@
       color,
       reminder, // -1 = none, 0 = same day, n = days before
       notes: str(input.notes, 1000),
-      active: input.active !== false,
+      active,
       createdAt: Number.isFinite(input.createdAt) ? input.createdAt : now,
       updatedAt: now,
     };
+  }
+
+  function money(v) {
+    const n = Math.round(Number(v) * 100) / 100;
+    return Number.isFinite(n) && n >= 0 && n <= 1e7 ? n : null;
+  }
+
+  const ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+  function sanitizePriceHistory(input, startDate, price) {
+    const byDate = new Map();
+    if (Array.isArray(input)) {
+      for (const e of input.slice(0, 200)) {
+        const p = e && money(e.price);
+        if (p != null && ISO.test(e.from) && ST.schedule.parseISO(e.from)) byDate.set(e.from, p);
+      }
+    }
+    if (!byDate.size) return [{ from: startDate, price }];
+    return [...byDate].sort(([a], [b]) => (a < b ? -1 : 1)).map(([from, p]) => ({ from, price: p }));
+  }
+
+  function sanitizeCharges(input) {
+    const out = {};
+    if (!input || typeof input !== 'object') return out;
+    for (const [iso, c] of Object.entries(input).slice(0, 5000)) {
+      if (!ISO.test(iso) || !ST.schedule.parseISO(iso) || !c) continue;
+      if (c.status === 'skipped') out[iso] = { status: 'skipped' };
+      else if (c.status === 'paid') {
+        const a = money(c.amount);
+        out[iso] = a == null ? { status: 'paid' } : { status: 'paid', amount: a };
+      }
+    }
+    return out;
   }
 
   function uuid() {
