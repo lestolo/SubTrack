@@ -5,7 +5,7 @@
   'use strict';
   const ST = g.ST;
   const { db, schedule, catalog, i18n, ui, reminders } = ST;
-  const { h, icon, logo, sheet, toast, haptic } = ui;
+  const { h, append, icon, logo, sheet, toast, haptic } = ui;
   const t = (...a) => i18n.t(...a);
 
   const state = {
@@ -189,13 +189,17 @@
         },
       })));
 
-    $('summary').replaceChildren(
+    // ui.append skips null children; native replaceChildren() would render
+    // a missing note as the text "null".
+    $('summary').replaceChildren();
+    append($('summary'), [
       h('div', { class: 'summary-top' },
         h('p', { class: 'summary-label', text: t(yearly ? 'summary.yearly' : 'summary.monthly') }),
         seg),
       amount,
       extra,
-      h('p', { class: 'summary-count', text: i18n.tp('summary.active', activeCount) }));
+      h('p', { class: 'summary-count', text: i18n.tp('summary.active', activeCount) }),
+    ]);
   }
 
   function renderUpcoming(rows) {
