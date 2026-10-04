@@ -160,6 +160,9 @@
 
     document.body.append(dlg);
     dlg.showModal();
+    // Fallback for browsers without overflow: clip, where focusing the
+    // off-screen close button scrolls the dialog (see css dialog.sheet).
+    dlg.scrollTop = 0;
     document.documentElement.classList.add('sheet-open');
     requestAnimationFrame(() => requestAnimationFrame(() => dlg.classList.add('open')));
 

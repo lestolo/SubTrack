@@ -153,7 +153,7 @@ svg.i.inline { width: 18px; height: 18px; vertical-align: -3px; color: var(--acc
     radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 55%),
     linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   box-shadow: 0 16px 40px color-mix(in srgb, var(--accent) 35%, transparent);
-  animation: rise 0.5s var(--ease-spring) both;
+  animation: rise 0.5s var(--ease-spring) backwards;
 }
 .summary::after {
   content: "";
@@ -249,7 +249,7 @@ svg.i.inline { width: 18px; height: 18px; vertical-align: -3px; color: var(--acc
   box-shadow: var(--shadow);
   text-align: left;
   transition: transform 0.15s ease;
-  animation: rise 0.45s var(--ease-spring) both;
+  animation: rise 0.45s var(--ease-spring) backwards;
 }
 .up-card:active { transform: scale(0.97); }
 .up-card .logo { margin-bottom: 8px; }
@@ -327,7 +327,7 @@ svg.i.inline { width: 18px; height: 18px; vertical-align: -3px; color: var(--acc
 
 /* ---------- Empty state ---------- */
 
-.empty { text-align: center; padding: 48px 12px 0; animation: rise 0.5s var(--ease-spring) both; }
+.empty { text-align: center; padding: 48px 12px 0; animation: rise 0.5s var(--ease-spring) backwards; }
 .empty h2 { font-size: 22px; margin-top: 24px; }
 .empty p { color: var(--muted); margin: 8px auto 24px; max-width: 300px; }
 .empty-art { position: relative; width: 140px; height: 120px; margin: 0 auto; }
@@ -387,7 +387,7 @@ svg.i.inline { width: 18px; height: 18px; vertical-align: -3px; color: var(--acc
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 45%, transparent);
   transition: transform 0.2s var(--ease-spring);
-  animation: pop 0.5s 0.15s var(--ease-spring) both;
+  animation: pop 0.5s 0.15s var(--ease-spring) backwards;
 }
 .fab:active { transform: scale(0.9) rotate(90deg); }
 .fab svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
@@ -407,6 +407,10 @@ dialog.sheet {
   background: transparent;
   color: var(--text);
   overflow: hidden;
+  /* clip (unlike hidden) can't be scrolled programmatically: otherwise the
+     initial focus scrolls the dialog to the off-screen panel and the
+     slide-up animation starts halfway. */
+  overflow: clip;
 }
 dialog.sheet::backdrop { background: rgba(8, 8, 16, 0); transition: background 0.26s ease; }
 dialog.sheet.open::backdrop { background: rgba(8, 8, 16, 0.45); }
@@ -527,7 +531,7 @@ dialog.sheet.open .sheet-panel { transform: translate(-50%, 0); }
   box-shadow: var(--shadow);
   text-align: center;
   transition: transform 0.15s ease;
-  animation: rise 0.35s var(--ease-spring) both;
+  animation: rise 0.35s var(--ease-spring) backwards;
 }
 .cat-tile:active { transform: scale(0.95); }
 .cat-tile .logo { margin-bottom: 6px; }
@@ -540,7 +544,7 @@ dialog.sheet.open .sheet-panel { transform: translate(-50%, 0); }
 
 .form { display: grid; gap: 16px; }
 .form-hero { display: grid; justify-items: center; gap: 10px; padding: 6px 0 4px; }
-.form-hero .logo { animation: pop 0.45s var(--ease-spring) both; }
+.form-hero .logo { animation: pop 0.45s var(--ease-spring) backwards; }
 .hero-name { font-size: 20px; font-weight: 750; text-align: center; overflow-wrap: anywhere; }
 
 .field { display: grid; gap: 6px; }
@@ -576,7 +580,7 @@ input[type="date"]::-webkit-date-and-time-value { text-align: left; }
 .input-color::-webkit-color-swatch { border: 0; border-radius: 10px; }
 .input-color::-moz-color-swatch { border: 0; border-radius: 10px; }
 
-.custom-freq { display: flex; align-items: center; gap: 8px; margin-top: 8px; animation: rise 0.25s ease both; }
+.custom-freq { display: flex; align-items: center; gap: 8px; margin-top: 8px; animation: rise 0.25s ease backwards; }
 .custom-freq > span { font-weight: 600; color: var(--muted); }
 .input-every { width: 84px; text-align: center; }
 
@@ -592,7 +596,7 @@ input[type="date"]::-webkit-date-and-time-value { text-align: left; }
   color: var(--accent);
   font-size: 14px;
   font-weight: 650;
-  animation: rise 0.25s ease both;
+  animation: rise 0.25s ease backwards;
 }
 
 .switch-row {

@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-10-04
+
+### Fixed
+
+- Bottom sheets (Settings, Add subscription) no longer appear halfway up and then jump: the initial focus scrolled the dialog before the slide-up animation started.
+- Press feedback on the add button, upcoming cards and catalogue tiles now works (entrance animations no longer pin `transform`).
+
 ## [1.0.0] - 2026-10-04
 
 ### Added
