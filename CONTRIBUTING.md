@@ -12,8 +12,8 @@ Thanks for taking the time to contribute! 🎉 Issues and pull requests in Engli
 ## Getting started
 
 ```bash
-git clone https://github.com/<your-user>/subscription-tracker.git
-cd subscription-tracker
+git clone https://github.com/<your-user>/SubTrack.git
+cd SubTrack
 npm start   # http://localhost:8080
 npm test
 ```
@@ -40,7 +40,7 @@ Edit `RAW` in `js/core/catalog.js`: `[id, name, category, brandColor, simpleIcon
 
 ## Reporting bugs
 
-Use the [bug report template](https://github.com/lestolo/subscription-tracker/issues/new?template=bug_report.yml) and include your device, OS and browser version. Remove personal data from screenshots and exported files.
+Use the [bug report template](https://github.com/lestolo/SubTrack/issues/new?template=bug_report.yml) and include your device, OS and browser version. Remove personal data from screenshots and exported files.
 
 ## Security issues
 

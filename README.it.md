@@ -6,7 +6,7 @@
 
 **Tutti i tuoi abbonamenti in un posto solo: privata, offline-first, installabile.**
 
-[![CI](https://github.com/lestolo/subscription-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/lestolo/subscription-tracker/actions/workflows/ci.yml)
+[![CI](https://github.com/lestolo/SubTrack/actions/workflows/ci.yml/badge.svg)](https://github.com/lestolo/SubTrack/actions/workflows/ci.yml)
 [![Licenza: MIT](https://img.shields.io/badge/Licenza-MIT-6D5EF5.svg)](LICENSE)
 ![PWA](https://img.shields.io/badge/PWA-ready-8B5CF6)
 ![Nessuna dipendenza](https://img.shields.io/badge/dipendenze-0-1F9D55)
@@ -39,8 +39,8 @@
 Serve un qualsiasi web server statico. Per lo sviluppo locale: [Node.js](https://nodejs.org) ≥ 20 (facoltativo, solo per il server di sviluppo e i test).
 
 ```bash
-git clone https://github.com/lestolo/subscription-tracker.git
-cd subscription-tracker
+git clone https://github.com/lestolo/SubTrack.git
+cd SubTrack
 npm start            # avvia l'app su http://localhost:8080
 ```
 
@@ -54,7 +54,7 @@ L'app è una cartella di file statici, senza build e senza variabili d'ambiente.
 
 ### Vercel
 
-[![Deploy con Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flestolo%2Fsubscription-tracker)
+[![Deploy con Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flestolo%2FSubTrack)
 
 1. Importa il repository su Vercel.
 2. Framework preset: **Other**. Build command: *nessuno*. Output directory: `.` (root).
@@ -109,7 +109,7 @@ npm start            # server di sviluppo locale
 
 ## Contribuire
 
-I contributi sono benvenuti. Leggi [CONTRIBUTING.md](CONTRIBUTING.md) e il [Codice di condotta](CODE_OF_CONDUCT.md). Segnala bug e idee tramite le [GitHub Issues](https://github.com/lestolo/subscription-tracker/issues).
+I contributi sono benvenuti. Leggi [CONTRIBUTING.md](CONTRIBUTING.md) e il [Codice di condotta](CODE_OF_CONDUCT.md). Segnala bug e idee tramite le [GitHub Issues](https://github.com/lestolo/SubTrack/issues).
 
 ## Crediti e marchi
 
