@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title>SubTrack</title>
+  <meta name="description" content="Track all your subscriptions in one place. Offline-first, private: your data stays on your device.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F4F4F8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B0B10" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SubTrack">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="icons/icon.svg" alt="" width="32" height="32">
+        <div>
+          <h1>SubTrack</h1>
+          <p class="tagline" data-i18n="app.tagline"></p>
+        </div>
+      </div>
+      <button class="icon-btn" id="btn-settings" type="button" data-i18n-label="nav.settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+      </button>
+    </header>
+
+    <main id="main">
+      <section class="summary" id="summary" aria-live="polite"></section>
+      <section class="section" id="upcoming-section">
+        <h2 data-i18n="upcoming.title"></h2>
+        <div class="upcoming" id="upcoming"></div>
+      </section>
+      <section class="section" id="list-section">
+        <div class="section-head">
+          <h2 data-i18n="list.title"></h2>
+          <label class="sort">
+            <span class="sr-only" data-i18n="list.sort"></span>
+            <select id="sort"></select>
+          </label>
+        </div>
+        <ul class="sub-list" id="list"></ul>
+      </section>
+      <section class="empty" id="empty" hidden>
+        <div class="empty-art" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <h2 data-i18n="empty.title"></h2>
+        <p data-i18n="empty.text"></p>
+        <button class="btn btn-primary" id="btn-empty-add" type="button" data-i18n="empty.cta"></button>
+      </section>
+    </main>
+  </div>
+
+  <button class="fab" id="btn-add" type="button" data-i18n-label="nav.add">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+  <div class="toast-host" id="toasts" aria-live="polite"></div>
+
+  <noscript><p class="noscript">SubTrack requires JavaScript.</p></noscript>
+
+  <script src="js/core/version.js" defer></script>
+  <script src="js/core/catalog.js" defer></script>
+  <script src="js/core/icons.js" defer></script>
+  <script src="js/core/schedule.js" defer></script>
+  <script src="js/core/i18n.js" defer></script>
+  <script src="js/core/db.js" defer></script>
+  <script src="js/core/reminders.js" defer></script>
+  <script src="js/core/ics.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/install.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

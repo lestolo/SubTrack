@@ -1,0 +1,6 @@
+tests/
+tools/
+docs/
+.github/
+*.md
+!README.md
