@@ -9,6 +9,7 @@ importScripts(
   'js/core/schedule.js',
   'js/core/i18n.js',
   'js/core/db.js',
+  'js/core/history.js',
   'js/core/reminders.js',
 );
 
@@ -26,6 +27,7 @@ const ASSETS = [
   'js/core/db.js',
   'js/core/reminders.js',
   'js/core/ics.js',
+  'js/core/history.js',
   'js/ui.js',
   'js/install.js',
   'js/app.js',

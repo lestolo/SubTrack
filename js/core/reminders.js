@@ -29,6 +29,10 @@
     return out;
   }
 
+  function price(item) {
+    return ST.history ? ST.history.priceAt(item.sub, ST.schedule.toISO(item.next)) : item.sub.price;
+  }
+
   function text(item) {
     const { t, fmtMoney, fmtDate } = ST.i18n;
     const when = item.days === 0 ? t('notif.today')
@@ -36,7 +40,7 @@
         : t('notif.inDays', { n: item.days });
     return {
       title: t('notif.title', { name: item.sub.name, when }),
-      body: `${fmtMoney(item.sub.price, item.sub.currency)} · ${fmtDate(item.next, { weekday: 'long', day: 'numeric', month: 'long' })}`,
+      body: `${fmtMoney(price(item), item.sub.currency)} · ${fmtDate(item.next, { weekday: 'long', day: 'numeric', month: 'long' })}`,
     };
   }
 

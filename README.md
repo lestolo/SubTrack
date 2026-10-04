@@ -39,6 +39,7 @@
 - **Flexible billing**: monthly, quarterly or yearly, or any custom period ("every 4 months", "every 2 weeks", …). Month-end dates are handled correctly (31 Jan → 28/29 Feb → 31 Mar).
 - **Multi-currency**: each subscription has its own currency. Totals are shown per currency, or as one total in your main currency if you enter your own exchange rates (rates are never fetched online).
 - **Dashboard**: monthly or yearly spend, upcoming renewals for the next 30 days, sorting by renewal date, cost or name, and pausing a subscription without deleting it.
+- **Payment history**: past charges are calculated automatically, and you can confirm the amount actually paid or mark a charge as not charged. Price changes apply from a date of your choice, so the history stays accurate. An "Actual spending" chart shows the last 12 months.
 - **Reminders**: local notifications plus a **calendar export (.ics)** with alerts for reliable reminders on any phone.
 - **Installable PWA**: works offline and opens full screen. An animated guide shows how to add the app to the Home Screen on iOS and Android.
 - **Bilingual UI**: Italian and English, detected automatically and switchable.
@@ -147,6 +148,7 @@ For reminders that always arrive on time, use **Settings → Export to calendar*
 │   │   ├── db.js           IndexedDB storage, validation, backup
 │   │   ├── reminders.js    Local notifications
 │   │   ├── ics.js          Calendar export
+│   │   ├── history.js      Payment history and actual spending
 │   │   └── version.js      App version (also names the offline cache)
 │   ├── ui.js               DOM helpers, bottom sheets, toasts
 │   ├── install.js          "Add to Home Screen" guide

@@ -26,6 +26,7 @@
 - **Frequenza flessibile**: mensile, trimestrale, annuale o personalizzata ("ogni 4 mesi", "ogni 2 settimane", …). Le date di fine mese sono gestite correttamente (31 gen → 28/29 feb → 31 mar).
 - **Multivaluta**: ogni abbonamento ha la sua valuta. I totali sono mostrati per valuta, oppure come totale unico nella valuta principale se inserisci i tuoi tassi di cambio (i tassi non vengono mai scaricati da internet).
 - **Dashboard**: spesa mensile o annuale, rinnovi dei prossimi 30 giorni, ordinamento per rinnovo, costo o nome, e pausa degli abbonamenti senza eliminarli.
+- **Storico pagamenti**: gli addebiti passati vengono calcolati in automatico, e puoi confermare l'importo pagato davvero o segnare un addebito come non avvenuto. Le variazioni di prezzo valgono dalla data che scegli, così lo storico resta corretto. Il grafico "Spesa effettiva" mostra gli ultimi 12 mesi.
 - **Promemoria**: notifiche locali più un **export nel calendario (.ics)** con avvisi, per promemoria affidabili su qualsiasi telefono.
 - **PWA installabile**: funziona offline e si apre a schermo intero. Una guida animata mostra come aggiungere l'app alla schermata Home su iOS e Android.
 - **Interfaccia bilingue**: italiano e inglese, con rilevamento automatico e selettore manuale.
