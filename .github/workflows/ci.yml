@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Unit tests
+        run: npm test
+      - name: Check that every cached asset exists
+        run: |
+          node -e "
+            const fs = require('fs');
+            const src = fs.readFileSync('sw.js', 'utf8');
+            const list = src.match(/const ASSETS = \[([\s\S]*?)\];/)[1].match(/'([^']+)'/g).map(s => s.slice(1, -1));
+            const missing = list.filter(p => p !== './' && !fs.existsSync(p));
+            if (missing.length) { console.error('Missing assets:', missing); process.exit(1); }
+            console.log('All', list.length, 'cached assets exist');
+          "
+      - name: Validate JSON files
+        run: |
+          node -e "for (const f of ['manifest.webmanifest','vercel.json','package.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"

@@ -1,0 +1,30 @@
+name: 📺 Add a service to the catalogue
+description: Request a subscription service to be added to the built-in catalogue
+labels: ["catalogue"]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Service name
+      placeholder: e.g. Crunchyroll
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: Official website
+      placeholder: https://…
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options: [Video & TV, Music & audio, Cloud storage, Productivity, AI, Creative, Gaming, VPN & security, Shopping & food, News & reading, Health & fitness, Education, Phone & internet, Finance, Social, Other]
+    validations:
+      required: true
+  - type: input
+    id: icon
+    attributes:
+      label: Simple Icons slug (if available)
+      description: Search on https://simpleicons.org
