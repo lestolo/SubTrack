@@ -4,8 +4,8 @@
 (function (g) {
   'use strict';
   const ST = g.ST;
-  const { db, schedule, catalog, i18n, ui, reminders } = ST;
-  const { h, icon, logo, sheet, toast, haptic } = ui;
+  const { db, schedule, catalog, i18n, ui, reminders, history } = ST;
+  const { h, append, icon, logo, sheet, toast, haptic } = ui;
   const t = (...a) => i18n.t(...a);
 
   const state = {
@@ -97,11 +97,15 @@
 
   function enrich(sub, today) {
     const next = schedule.nextRenewal(sub.startDate, sub.freq, today);
+    // A price change can be scheduled for a later renewal: use the price in
+    // force at the next one.
+    const price = next ? history.priceAt(sub, schedule.toISO(next)) : sub.price;
     return {
       sub,
       next,
+      price,
       days: next ? schedule.diffDays(today, next) : Infinity,
-      monthly: schedule.monthlyCost(sub.price, sub.freq),
+      monthly: schedule.monthlyCost(price, sub.freq),
     };
   }
 
@@ -145,10 +149,12 @@
     $('summary').hidden = empty;
     $('upcoming-section').hidden = empty;
     $('list-section').hidden = empty;
+    $('spend-section').hidden = empty;
     if (empty) return;
     renderSummary(rows);
     renderUpcoming(rows);
     renderList(rows);
+    renderSpend();
   }
 
   function renderSummary(rows) {
@@ -189,13 +195,17 @@
         },
       })));
 
-    $('summary').replaceChildren(
+    // ui.append skips null children; native replaceChildren() would render
+    // a missing note as the text "null".
+    $('summary').replaceChildren();
+    append($('summary'), [
       h('div', { class: 'summary-top' },
         h('p', { class: 'summary-label', text: t(yearly ? 'summary.yearly' : 'summary.monthly') }),
         seg),
       amount,
       extra,
-      h('p', { class: 'summary-count', text: i18n.tp('summary.active', activeCount) }));
+      h('p', { class: 'summary-count', text: i18n.tp('summary.active', activeCount) }),
+    ]);
   }
 
   function renderUpcoming(rows) {
@@ -216,7 +226,7 @@
     logo(r.sub, 'sm'),
     h('span', { class: 'up-name', text: r.sub.name }),
     h('span', { class: 'up-when', text: i18n.relDays(r.days, r.next) }),
-    h('span', { class: 'up-price', text: i18n.fmtMoney(r.sub.price, r.sub.currency) }))));
+    h('span', { class: 'up-price', text: i18n.fmtMoney(r.price, r.sub.currency) }))));
   }
 
   function renderList(rowsArg) {
@@ -247,7 +257,7 @@
           sub.active ? null : h('span', { class: 'badge', text: t('list.paused') }),
           meta)),
       h('span', { class: 'sub-price' },
-        h('span', { class: 'price', text: i18n.fmtMoney(sub.price, sub.currency) }),
+        h('span', { class: 'price', text: i18n.fmtMoney(r.price, sub.currency) }),
         sub.freq.unit !== 'month' || sub.freq.every !== 1
           ? h('span', { class: 'per', text: `≈ ${i18n.fmtMoney(r.monthly, sub.currency)}${t('per.month')}` })
           : null)));
@@ -491,6 +501,7 @@
 
     const preview = h('p', { class: 'preview', 'aria-live': 'polite' });
     function updatePreview() {
+      if (editing) updatePriceScope();
       const p = parsePrice(price.value);
       const next = schedule.nextRenewal(start.value, freq);
       if (!next || !Number.isFinite(p)) {
@@ -514,10 +525,59 @@
       header.replaceChildren(logo(preview, 'lg'), h('p', { class: 'hero-name', text: name.value || t('form.new') }));
     }
 
+    // When the price of an existing subscription changes, ask from when the
+    // new price applies, so past charges keep the price actually paid.
+    const priceScope = h('select', { class: 'input' });
+    const priceScopeField = h('div', { class: 'field', hidden: true },
+      h('label', { for: 'f-price-scope', text: t('price.apply') }),
+      Object.assign(priceScope, { id: 'f-price-scope' }));
+    function updatePriceScope() {
+      const p = parsePrice(price.value);
+      const tomorrow = schedule.addDays(schedule.today(), 1);
+      const last = schedule.parseISO(start.value) && schedule.isValidFreq(freq)
+        ? schedule.previousRenewal(start.value, freq, tomorrow) : null;
+      const show = editing && Number.isFinite(p) && p !== opts.sub.price && !!last;
+      priceScopeField.hidden = !show;
+      if (!show) return;
+      const next = schedule.nextRenewal(start.value, freq, tomorrow);
+      const prev = priceScope.value;
+      const fmt = (d) => i18n.fmtDate(d, { day: 'numeric', month: 'short', year: 'numeric' });
+      priceScope.replaceChildren(
+        h('option', { value: schedule.toISO(next), text: t('price.fromNext', { date: fmt(next) }) }),
+        h('option', { value: schedule.toISO(last), text: t('price.fromLast', { date: fmt(last) }) }),
+        h('option', { value: 'all', text: t('price.all') }));
+      if ([...priceScope.options].some((o) => o.value === prev)) priceScope.value = prev;
+    }
+    if (editing) {
+      price.addEventListener('input', updatePriceScope);
+      start.addEventListener('input', updatePriceScope);
+    }
+
     for (const el of [price, start]) el.addEventListener('input', updatePreview);
     currency.addEventListener('change', updatePreview);
     name.addEventListener('input', drawHero);
     color.addEventListener('input', drawHero);
+
+    const historyCard = editing ? h('button', { type: 'button', class: 'history-card' }) : null;
+    function drawHistoryCard() {
+      if (!historyCard) return;
+      const cur = state.subs.find((x) => x.id === opts.sub.id) || opts.sub;
+      const sum = history.summary(cur, schedule.today());
+      const sub2 = sum.count
+        ? i18n.tp('history.count', sum.count, { date: i18n.fmtDate(sum.since) })
+        : t('history.none', { date: i18n.fmtDate(schedule.nextRenewal(cur.startDate, cur.freq) || schedule.today()) });
+      historyCard.replaceChildren(
+        h('span', { class: 'history-card-text' },
+          h('span', { class: 'label', text: t('history.paidSoFar') }),
+          h('span', { class: 'history-card-total', text: i18n.fmtMoney(sum.total, cur.currency) }),
+          h('span', { class: 'hint', text: sub2 })),
+        icon('chevron', 'chev'));
+    }
+    if (historyCard) {
+      historyCard.setAttribute('aria-label', t('history.open'));
+      historyCard.addEventListener('click', () => openHistory(opts.sub.id, drawHistoryCard));
+      drawHistoryCard();
+    }
 
     const priceWrap = h('div', { class: 'field' },
       h('label', { for: 'f-price', text: t('form.price') }),
@@ -529,8 +589,10 @@
 
     const form = h('form', { class: 'form', novalidate: true },
       header,
+      historyCard,
       nameField,
       priceWrap,
+      priceScopeField,
       h('div', { class: 'field' },
         h('span', { class: 'label', text: t('form.frequency') }),
         seg, customRow, freqError),
@@ -592,11 +654,30 @@
         target.focus();
         return;
       }
+      // Start from the stored copy: the history sheet may have changed it.
+      const stored = editing ? (state.subs.find((x) => x.id === opts.sub.id) || opts.sub) : {};
+      const today = schedule.today();
+      const nowActive = editing ? active.checked : true;
+      let priceHistory;
+      if (!editing) priceHistory = [{ from: start.value, price: p }];
+      else if (p !== stored.price) {
+        const scope = priceScopeField.hidden ? 'all' : priceScope.value;
+        priceHistory = history.withPrice({ ...stored, startDate: start.value }, p, scope);
+      } else priceHistory = stored.priceHistory;
+      let { pausedAt = null, charges = {} } = stored;
+      if (editing && stored.active && !nowActive) pausedAt = schedule.toISO(today);
+      if (editing && !stored.active && nowActive) {
+        charges = { ...history.skippedWhilePaused({ ...stored, startDate: start.value, freq }, today), ...charges };
+        pausedAt = null;
+      }
       const data = {
-        ...(opts.sub || {}),
+        ...stored,
         catalogId: base.catalogId,
         name: name.value,
         price: p,
+        priceHistory,
+        charges,
+        pausedAt,
         currency: currency.value,
         freq,
         startDate: start.value,
@@ -604,13 +685,10 @@
         color: base.catalogId ? base.color : color.value.slice(1),
         reminder: parseInt(reminder.value, 10),
         notes: notes.value,
-        active: editing ? active.checked : true,
+        active: nowActive,
       };
       try {
-        const saved = await db.put(data);
-        const i = state.subs.findIndex((x) => x.id === saved.id);
-        if (i >= 0) state.subs[i] = saved;
-        else state.subs.push(saved);
+        await saveSub(data);
         haptic(12);
         s.close('saved');
         render();
@@ -626,6 +704,222 @@
     if (!editing && !base.name && g.matchMedia('(pointer: fine)').matches) name.focus();
   }
 
+  // ---------- Payment history ----------
+
+  async function saveSub(next) {
+    const saved = await db.put(next);
+    const i = state.subs.findIndex((x) => x.id === saved.id);
+    if (i >= 0) state.subs[i] = saved;
+    else state.subs.push(saved);
+    return saved;
+  }
+
+  function openHistory(id, onChange) {
+    const SHOWN = 12;
+    let expanded = false;
+    const body = h('div', { class: 'history' });
+    const s = sheet({ title: t('history.title'), className: 'sheet-tall', body });
+
+    function changed() {
+      draw();
+      render();
+      if (onChange) onChange();
+    }
+
+    function draw() {
+      const sub = state.subs.find((x) => x.id === id);
+      if (!sub) { s.close(); return; }
+      const today = schedule.today();
+      const sum = history.summary(sub, today);
+      // Everything up to today plus the next upcoming charge, newest first.
+      const next = sub.active ? schedule.nextRenewal(sub.startDate, sub.freq, schedule.addDays(today, 1)) : null;
+      const all = history.charges(sub, next || today, today).reverse();
+      const visible = expanded ? all : all.slice(0, SHOWN);
+
+      const head = h('div', { class: 'history-head' },
+        logo(sub),
+        h('div', null,
+          h('p', { class: 'label', text: t('history.paidSoFar') }),
+          h('p', { class: 'history-total', text: i18n.fmtMoney(sum.total, sub.currency) }),
+          h('p', {
+            class: 'hint',
+            text: sum.count
+              ? i18n.tp('history.count', sum.count, { date: i18n.fmtDate(sum.since) })
+              : t('history.none', { date: i18n.fmtDate(schedule.nextRenewal(sub.startDate, sub.freq) || today) }),
+          })));
+
+      const rows = visible.map((c) => {
+        const disabled = c.status === 'upcoming';
+        const amount = c.status === 'skipped' ? '—' : i18n.fmtMoney(c.amount, c.currency);
+        const showExpected = c.status === 'paid' && c.amount !== c.expected;
+        return h('li', null, h('button', {
+          type: 'button',
+          class: `charge-row is-${c.status}`,
+          disabled,
+          'aria-label': `${i18n.fmtDate(c.date)}, ${amount}, ${t(`history.status.${c.status}`)}`,
+          on: { click: () => openCharge(sub, c, changed) },
+        },
+        h('span', { class: 'charge-date', text: i18n.fmtDate(c.date, { day: 'numeric', month: 'short', year: 'numeric' }) }),
+        h('span', { class: `chip-status st-${c.status}`, text: t(`history.status.${c.status}`) }),
+        h('span', { class: 'charge-amount' },
+          h('span', { text: amount }),
+          showExpected ? h('span', { class: 'per', text: t('history.expected', { amount: i18n.fmtMoney(c.expected, c.currency) }) }) : null)));
+      });
+
+      const prices = (sub.priceHistory || []).length > 1
+        ? h('section', { class: 'set-group' },
+          h('h3', { text: t('history.prices') }),
+          h('ul', { class: 'set-card price-list' },
+            [...sub.priceHistory].reverse().map((e) => h('li', { class: 'set-row' },
+              h('span', { class: 'set-text', text: i18n.fmtDate(schedule.parseISO(e.from)) }),
+              h('span', { class: 'price', text: i18n.fmtMoney(e.price, sub.currency) })))))
+        : null;
+
+      body.replaceChildren();
+      append(body, [
+        head,
+        h('p', { class: 'hint history-hint', text: t('history.hint') }),
+        all.length ? h('section', { class: 'set-group' },
+          h('h3', { text: t('history.charges') }),
+          h('ul', { class: 'set-card charge-list' }, rows),
+          !expanded && all.length > SHOWN ? h('button', {
+            type: 'button',
+            class: 'btn btn-ghost btn-block show-all',
+            text: t('history.showAll', { n: all.length }),
+            on: { click: () => { expanded = true; draw(); } },
+          }) : null) : null,
+        prices,
+      ]);
+    }
+    draw();
+  }
+
+  function openCharge(sub, charge, onChange) {
+    const override = sub.charges && sub.charges[charge.iso];
+    const amount = h('input', {
+      class: 'input input-price',
+      type: 'text',
+      inputmode: 'decimal',
+      autocomplete: 'off',
+      value: String(charge.status === 'skipped' ? charge.expected : charge.amount)
+        .replace('.', i18n.lang === 'it' ? ',' : '.'),
+    });
+    const err = h('p', { class: 'error', 'aria-live': 'polite' });
+    const confirmBtn = h('button', { class: 'btn btn-primary btn-block', type: 'button', text: t('charge.confirm') });
+    const skipBtn = h('button', { class: 'btn btn-ghost btn-block', type: 'button', text: t('charge.skip') });
+    const resetBtn = override
+      ? h('button', { class: 'btn btn-ghost btn-block', type: 'button', text: t('charge.reset') }) : null;
+
+    const s = sheet({
+      title: t('charge.title', { date: i18n.fmtDate(charge.date, { day: 'numeric', month: 'long', year: 'numeric' }) }),
+      body: h('div', { class: 'form' },
+        h('div', { class: 'field' },
+          h('label', { for: 'f-charge', text: t('charge.amount') }),
+          h('div', { class: 'price-row' },
+            Object.assign(amount, { id: 'f-charge' }),
+            h('span', { class: 'input input-currency currency-static', text: sub.currency })),
+          err),
+        h('p', { class: 'hint', text: t('history.expected', { amount: i18n.fmtMoney(charge.expected, sub.currency) }) })),
+      footer: h('div', { class: 'form-actions' }, confirmBtn, skipBtn, resetBtn),
+    });
+
+    async function update(entry) {
+      const fresh = state.subs.find((x) => x.id === sub.id) || sub;
+      const charges = { ...(fresh.charges || {}) };
+      if (entry) charges[charge.iso] = entry;
+      else delete charges[charge.iso];
+      await saveSub({ ...fresh, charges });
+      haptic(12);
+      s.close('saved');
+      toast(t('charge.saved'));
+      onChange();
+    }
+
+    confirmBtn.addEventListener('click', () => {
+      const v = parsePrice(amount.value);
+      if (!Number.isFinite(v) || v < 0) {
+        err.textContent = t('form.errPrice');
+        amount.focus();
+        return;
+      }
+      update({ status: 'paid', amount: Math.round(v * 100) / 100 });
+    });
+    skipBtn.addEventListener('click', () => update({ status: 'skipped' }));
+    if (resetBtn) resetBtn.addEventListener('click', () => update(null));
+  }
+
+  // ---------- Actual spending chart ----------
+
+  function renderSpend() {
+    const host = $('spend');
+    const today = schedule.today();
+    const buckets = history.monthly(state.subs, 12, today);
+    const curs = new Set(state.subs.map((x) => x.currency));
+    const main = curs.size === 1 ? [...curs][0] : state.settings.currency;
+    const excluded = new Set();
+    const values = buckets.map((b) => {
+      let v = 0;
+      for (const [cur, amount] of b.byCur) {
+        const c = cur === main ? amount : convert(amount, cur);
+        if (c == null) excluded.add(cur);
+        else v += c;
+      }
+      return v;
+    });
+    const total = values.reduce((a, b) => a + b, 0);
+    const ytd = values.reduce((a, v, i) => a + (buckets[i].date.getFullYear() === today.getFullYear() ? v : 0), 0);
+
+    if (!total && !excluded.size) {
+      host.replaceChildren(h('p', { class: 'muted', text: t('spend.none') }));
+      return;
+    }
+
+    const max = Math.max(...values, 0);
+    const label = (i) => `${i18n.fmtDate(buckets[i].date, { month: 'long', year: 'numeric' })} · ${i18n.fmtMoney(values[i], main)}`;
+    const readout = h('p', { class: 'spend-readout', 'aria-live': 'polite', text: label(values.length - 1) });
+    const narrow = new Intl.DateTimeFormat(i18n.lang, { month: 'narrow' });
+
+    const bars = h('div', { class: 'bars', role: 'group', 'aria-label': t('spend.chart') },
+      values.map((v, i) => {
+        const bar = h('button', {
+          type: 'button',
+          class: `bar${i === values.length - 1 ? ' is-current' : ''}`,
+          'aria-label': label(i),
+        },
+        h('span', {
+          class: `bar-fill${v > 0 ? '' : ' is-zero'}`,
+          style: { '--h': `${max ? (v / max) * 100 : 0}%` },
+        }),
+        h('span', { class: 'bar-label', 'aria-hidden': 'true', text: narrow.format(buckets[i].date) }));
+        const show = () => {
+          readout.textContent = label(i);
+          for (const b of bars.children) b.classList.toggle('is-active', b === bar);
+        };
+        bar.addEventListener('pointerenter', show);
+        bar.addEventListener('focus', show);
+        bar.addEventListener('click', () => { show(); haptic(); });
+        return bar;
+      }));
+    bars.addEventListener('pointerleave', () => {
+      readout.textContent = label(values.length - 1);
+      for (const b of bars.children) b.classList.remove('is-active');
+    });
+
+    host.replaceChildren();
+    append(host, [
+      h('div', { class: 'spend-stats' },
+        h('div', null,
+          h('p', { class: 'label', text: t('spend.last12') }),
+          h('p', { class: 'spend-value', text: i18n.fmtMoney(total, main) })),
+        h('div', null,
+          h('p', { class: 'label', text: t('spend.ytd') }),
+          h('p', { class: 'spend-value', text: i18n.fmtMoney(ytd, main) }))),
+      readout,
+      bars,
+      excluded.size ? h('p', { class: 'hint spend-note', text: t('spend.only', { cur: main }) }) : null,
+    ]);
+  }
+
   function afterSave(editing) {
     const canAsk = 'Notification' in g && reminders.permission() === 'default' && !state.settings.notifications;
     if (!editing && canAsk && state.subs.length === 1) {
@@ -636,7 +930,10 @@
     runReminders();
   }
 
-  async function removeSub(sub, s) {
+  async function removeSub(original, s) {
+    // The history sheet may have updated the record since the form opened:
+    // keep the stored copy so Undo restores confirmed charges too.
+    const sub = state.subs.find((x) => x.id === original.id) || original;
     const ok = await ui.confirm(t('form.confirmDelete', { name: sub.name }), t('form.delete'));
     if (!ok) return;
     await db.remove(sub.id);

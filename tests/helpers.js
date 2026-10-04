@@ -7,6 +7,7 @@ await import('../js/core/i18n.js');
 await import('../js/core/db.js');
 await import('../js/core/reminders.js');
 await import('../js/core/ics.js');
+await import('../js/core/history.js');
 
 export const ST = globalThis.ST;
 export const d = (s) => ST.schedule.parseISO(s);
