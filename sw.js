@@ -21,7 +21,6 @@ const ASSETS = [
   'css/app.css',
   'js/core/version.js',
   'js/core/catalog.js',
-  'js/core/icons.js',
   'js/core/schedule.js',
   'js/core/i18n.js',
   'js/core/db.js',
@@ -37,6 +36,8 @@ const ASSETS = [
   'icons/maskable-512.png',
   'icons/apple-touch-icon.png',
   'icons/badge-96.png',
+  // Brand logos of the catalogue, so they show up offline too.
+  ...ST.catalog.ITEMS.map(ST.catalog.logoPath).filter(Boolean),
 ];
 
 self.addEventListener('install', (event) => {

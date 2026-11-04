@@ -141,8 +141,7 @@ For reminders that always arrive on time, use **Settings → Export to calendar*
 ├── css/app.css             All styles (light and dark themes, animations)
 ├── js/
 │   ├── core/               DOM-free logic, shared by the page, the service worker and the tests
-│   │   ├── catalog.js      Service catalogue (name, category, brand colour, icon)
-│   │   ├── icons.js        Brand icons (generated from Simple Icons)
+│   │   ├── catalog.js      Service catalogue (name, category, brand colour, logo source)
 │   │   ├── schedule.js     Billing-date maths
 │   │   ├── i18n.js         Translations (IT/EN) and formatting
 │   │   ├── db.js           IndexedDB storage, validation, backup
@@ -154,8 +153,9 @@ For reminders that always arrive on time, use **Settings → Export to calendar*
 │   ├── install.js          "Add to Home Screen" guide
 │   └── app.js              Application controller
 ├── icons/                  App icons
+│   └── brands/             Brand logos of the catalogue (generated, not MIT: see NOTICE.md)
 ├── tests/                  Unit tests (node:test)
-└── tools/build-icons.mjs   Regenerates js/core/icons.js
+└── tools/build-logos.mjs   Regenerates icons/brands/
 ```
 
 ## Development
@@ -165,7 +165,7 @@ npm test             # runs the unit tests (no install needed)
 npm start            # local dev server
 ```
 
-**Adding a service to the catalogue:** add a line to `RAW` in [`js/core/catalog.js`](js/core/catalog.js). If the brand exists on [simpleicons.org](https://simpleicons.org), set its slug and run `npm run icons` to embed the logo. Otherwise use `null` and a monogram is shown.
+**Adding a service to the catalogue:** add a line to `RAW` in [`js/core/catalog.js`](js/core/catalog.js). Find the brand's full-colour logo on [icon-sets.iconify.design](https://icon-sets.iconify.design) in the *theSVG Color*, *selfh.st* or *SVG Logos* sets, set it as `'set:icon'` (e.g. `'thesvg-color:netflix'`) and run `npm run logos` to bundle it in `icons/brands/`. Otherwise use `null` and a monogram is shown.
 
 **Adding a language:** copy the `en` block in [`js/core/i18n.js`](js/core/i18n.js), translate it and add the code to `LANGS`. A test checks that all languages have the same keys.
 
@@ -177,10 +177,10 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and ou
 
 ## Credits and trademarks
 
-- Brand icons come from [Simple Icons](https://simpleicons.org) (CC0-1.0).
-- All product names, logos and brands are property of their respective owners. They are used here only to identify services, and their use does not imply endorsement. Brands not available in Simple Icons are shown as a coloured monogram.
+- Brand logos come from the [theSVG](https://thesvg.org) (MIT), [selfh.st/icons](https://selfh.st/icons) (CC BY 4.0) and [SVG Logos](https://svgporn.com) (CC0-1.0) collections, via [Iconify](https://iconify.design). The full list with the source of each file is in [`icons/brands/NOTICE.md`](icons/brands/NOTICE.md).
+- All product names, logos and brands are property of their respective owners. They are used here only to identify services, and their use does not imply endorsement. Services without an available logo are shown as a coloured monogram. If you own a trademark and want its logo removed, please open an issue.
 - SubTrack is an independent project and is not affiliated with any of the listed services.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). The brand logos in [`icons/brands/`](icons/brands/) are not covered by this licence: see [`icons/brands/NOTICE.md`](icons/brands/NOTICE.md).

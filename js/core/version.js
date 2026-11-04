@@ -2,6 +2,6 @@
 (function (g) {
   'use strict';
   const ST = (g.ST = g.ST || {});
-  ST.VERSION = '1.1.1';
+  ST.VERSION = '1.2.0';
   ST.REPO_URL = 'https://github.com/lestolo/SubTrack';
 })(typeof self !== 'undefined' ? self : globalThis);
