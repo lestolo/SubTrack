@@ -13,9 +13,9 @@
 
 [English](README.md) · **Italiano**
 
-<img src="docs/screenshots/home-light.png" alt="Schermata principale" width="240">
-<img src="docs/screenshots/catalog.png" alt="Catalogo servizi" width="240">
-<img src="docs/screenshots/home-dark.png" alt="Tema scuro" width="240">
+<img src="docs/screenshots/it/home-light.png" alt="Schermata principale" width="240">
+<img src="docs/screenshots/it/catalog.png" alt="Catalogo servizi" width="240">
+<img src="docs/screenshots/it/home-dark.png" alt="Tema scuro" width="240">
 
 </div>
 
