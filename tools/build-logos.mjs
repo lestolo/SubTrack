@@ -18,7 +18,6 @@
  * network requests.
  */
 import { readFile, writeFile, readdir, mkdir, unlink } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { optimize } from 'svgo';
@@ -63,27 +62,61 @@ const COMMONS = 'https://commons.wikimedia.org/wiki/File:';
 const cacheDir = path.join(root, 'node_modules', '.cache', 'subtrack-logos');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Downloads a Wikimedia Commons file (cached), retrying when rate-limited. */
+const UA = 'SubTrack-build-logos/1.0 (https://github.com/lestolo/SubTrack)';
+
+/**
+ * GET with retries: Wikimedia answers 429 when requests come too fast, with a
+ * Retry-After header (up to several minutes) that is honoured here.
+ */
+async function get(url) {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const res = await fetch(url, { headers: { 'User-Agent': UA } });
+    if (res.status !== 429) {
+      if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+      return res;
+    }
+    const wait = Math.min(Number(res.headers.get('retry-after')) || 10 * 2 ** attempt, 900);
+    console.log(`Rate-limited by Wikimedia, waiting ${wait}s...`);
+    await sleep(wait * 1000);
+  }
+  throw new Error(`still rate-limited by Wikimedia (${url}), try again later`);
+}
+
+const plain = (html) => String(html || '').replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+
+/**
+ * Downloads a Wikimedia Commons file and its licence data (both cached in
+ * node_modules/.cache, so a rebuild makes no requests).
+ */
 async function fetchCommons(file) {
   const cached = path.join(cacheDir, file);
-  try {
-    return await readFile(cached, 'utf8');
-  } catch { /* not cached yet */ }
-  const md5 = createHash('md5').update(file).digest('hex');
-  const url = `https://upload.wikimedia.org/wikipedia/commons/${md5[0]}/${md5.slice(0, 2)}/${encodeURIComponent(file)}`;
-  for (let attempt = 0; attempt < 6; attempt++) {
-    const res = await fetch(url, { headers: { 'User-Agent': 'SubTrack-build-logos/1.0 (https://github.com/lestolo/SubTrack)' } });
-    if (res.status === 429) {
-      await sleep(5000 * 2 ** attempt);
-      continue;
-    }
-    if (!res.ok) throw new Error(`${file}: HTTP ${res.status} from ${url}`);
-    const text = await res.text();
-    await mkdir(cacheDir, { recursive: true });
-    await writeFile(cached, text);
-    return text;
+  const read = (f) => readFile(f, 'utf8').catch(() => null);
+  let meta = JSON.parse((await read(`${cached}.json`)) || 'null');
+  let raw = await read(cached);
+  if (meta && raw) return { raw, meta };
+  await mkdir(cacheDir, { recursive: true });
+  const api = `https://commons.wikimedia.org/w/api.php?${new URLSearchParams({
+    action: 'query', format: 'json', formatversion: '2', titles: `File:${file}`,
+    prop: 'imageinfo', iiprop: 'url|mime|extmetadata', iiextmetadatafilter: 'LicenseShortName|LicenseUrl|Artist',
+  })}`;
+  const page = (await (await get(api)).json()).query.pages[0];
+  const info = page && page.imageinfo && page.imageinfo[0];
+  if (!info) throw new Error(`${file}: not found on Wikimedia Commons`);
+  if (info.mime !== 'image/svg+xml') throw new Error(`${file}: not an SVG (${info.mime})`);
+  const ext = info.extmetadata || {};
+  meta = {
+    url: info.url,
+    license: plain(ext.LicenseShortName && ext.LicenseShortName.value) || 'see file page',
+    licenseUrl: (ext.LicenseUrl && ext.LicenseUrl.value) || null,
+    artist: plain(ext.Artist && ext.Artist.value).slice(0, 80) || null,
+  };
+  await writeFile(`${cached}.json`, JSON.stringify(meta, null, 2));
+  if (!raw) {
+    console.log(`Downloading ${file}`);
+    raw = await (await get(info.url)).text();
+    await writeFile(cached, raw);
   }
-  throw new Error(`${file}: still rate-limited by Wikimedia, try again later`);
+  return { raw, meta };
 }
 
 function cleanSvg(raw, id) {
@@ -106,9 +139,10 @@ for (const item of ITEMS) {
   const [prefix, name, extra] = item.logo.split(':');
   if (!prefix || !name || extra !== undefined) throw new Error(`${item.id}: invalid logo source "${item.logo}"`);
   if (prefix === 'wikimedia') {
-    const svg = cleanSvg(await fetchCommons(name), item.id);
-    if (UNSAFE.test(svg)) throw new Error(`${item.id}: unsafe content in ${item.logo}`);
-    files.set(`${item.id}.svg`, { svg, item, prefix, name });
+    const { raw, meta } = await fetchCommons(name);
+    const svg = cleanSvg(raw, item.id);
+    if (UNSAFE.test(svg)) throw new Error(`${item.id}: unsafe content in ${item.logo} (embedded images or external links are not allowed)`);
+    files.set(`${item.id}.svg`, { svg, item, prefix, name, meta });
     continue;
   }
   const set = await loadSet(prefix);
@@ -146,12 +180,12 @@ const setRows = [...sets].sort(([a], [b]) => a.localeCompare(b)).map(([prefix, s
   return `| \`${prefix}\` | [${author.name || prefix}](${author.url || ''}) | [${license.title || license.spdx}](${license.url || ''}) | \`@iconify-json/${prefix}@${s.version}\` |`;
 });
 if ([...files.values()].some((f) => f.prefix === 'wikimedia')) {
-  setRows.push('| `wikimedia` | [Wikimedia Commons](https://commons.wikimedia.org) | Free licence or public domain: see each file page below | Downloaded, optimised with svgo |');
+  setRows.push('| `wikimedia` | [Wikimedia Commons](https://commons.wikimedia.org) | Free licence or public domain, per file (see below) | Downloaded, optimised with svgo |');
 }
 const logoRows = [...files.values()]
   .sort((a, b) => a.item.name.localeCompare(b.item.name, 'en'))
-  .map(({ item, prefix, name }) => `| ${item.name} | \`${item.id}.svg\` | ${prefix === 'wikimedia'
-    ? `[Commons: ${name}](${COMMONS}${encodeURIComponent(name)})`
+  .map(({ item, prefix, name, meta }) => `| ${item.name} | \`${item.id}.svg\` | ${prefix === 'wikimedia'
+    ? `[Commons: ${name}](${COMMONS}${encodeURIComponent(name)}), ${meta.licenseUrl ? `[${meta.license}](${meta.licenseUrl})` : meta.license}${meta.artist ? `, by ${meta.artist.replace(/[|[\]]/g, ' ')}` : ''}`
     : `\`${prefix}:${name}\``} |`);
 
 const notice = `<!-- GENERATED FILE - do not edit by hand. Run: npm run logos -->
