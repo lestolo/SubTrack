@@ -69,8 +69,7 @@
   // ---------- Logos ----------
 
   function brandColor(item) {
-    const ic = item.icon && ST.icons[item.icon];
-    return (ic && ic.h) || item.color;
+    return item.color;
   }
 
   function isLight(hex) {
@@ -89,26 +88,27 @@
     return (Array.from(words[0])[0] + Array.from(words[1])[0]).toUpperCase();
   }
 
-  /** Logo tile for a subscription or catalogue item. */
-  function logo(entity, size) {
-    const item = entity.catalogId ? ST.catalog.get(entity.catalogId) : (entity.icon !== undefined ? entity : null);
-    const color = (entity.color || (item && brandColor(item)) || '6B7280').replace('#', '');
-    const tile = h('div', {
+  function monogram(entity, color, size) {
+    return h('div', {
       class: `logo${size ? ` logo-${size}` : ''}${isLight(color) ? ' is-light' : ''}`,
       style: { '--brand': `#${color}` },
       'aria-hidden': 'true',
-    });
-    const ic = item && item.icon && ST.icons[item.icon];
-    if (ic) {
-      const svg = document.createElementNS(SVG_NS, 'svg');
-      svg.setAttribute('viewBox', '0 0 24 24');
-      const p = document.createElementNS(SVG_NS, 'path');
-      p.setAttribute('d', ic.p);
-      svg.append(p);
-      tile.append(svg);
-    } else {
-      tile.append(h('span', { text: initials(entity.name) }));
-    }
+    }, h('span', { text: initials(entity.name) }));
+  }
+
+  /**
+   * Logo tile for a subscription or catalogue item: the brand's full-colour
+   * logo (bundled in icons/brands/) or, without one, a monogram tile.
+   */
+  function logo(entity, size) {
+    const item = entity.catalogId ? ST.catalog.get(entity.catalogId) : (entity.logo !== undefined ? entity : null);
+    const color = (entity.color || (item && brandColor(item)) || '6B7280').replace('#', '');
+    const src = ST.catalog.logoPath(item);
+    if (!src) return monogram(entity, color, size);
+    const tile = h('div', { class: `logo logo-brand${size ? ` logo-${size}` : ''}`, 'aria-hidden': 'true' });
+    const img = h('img', { src, alt: '', decoding: 'async', loading: 'lazy', draggable: 'false' });
+    img.addEventListener('error', () => tile.replaceWith(monogram(entity, color, size)), { once: true });
+    tile.append(img);
     return tile;
   }
 

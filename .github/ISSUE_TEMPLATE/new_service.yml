@@ -26,5 +26,5 @@ body:
   - type: input
     id: icon
     attributes:
-      label: Simple Icons slug (if available)
-      description: Search on https://simpleicons.org
+      label: Logo on Iconify (if available)
+      description: Search on https://icon-sets.iconify.design in the theSVG Color, selfh.st or SVG Logos sets, e.g. thesvg-color:netflix

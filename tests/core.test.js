@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readdir, readFile } from 'node:fs/promises';
 import { ST, d } from './helpers.js';
 
 const base = {
@@ -26,12 +27,32 @@ test('sanitize neutralises unexpected values', () => {
   assert.equal(s.catalogId, null);
 });
 
-test('every catalogue icon slug exists in icons.js', () => {
-  for (const item of ST.catalog.ITEMS) {
-    if (item.icon) assert.ok(ST.icons[item.icon], `missing icon ${item.icon}`);
-  }
+test('catalogue ids are unique and safe to use as file names', () => {
   const ids = ST.catalog.ITEMS.map((i) => i.id);
   assert.equal(new Set(ids).size, ids.length, 'duplicate catalogue ids');
+  for (const id of ids) assert.match(id, /^[a-z0-9]+$/, `bad catalogue id ${id}`);
+});
+
+test('bundled brand logos match the catalogue and are inert', async () => {
+  const dir = new URL('../icons/brands/', import.meta.url);
+  const files = new Set((await readdir(dir)).filter((f) => f.endsWith('.svg')));
+  const expected = new Set();
+  for (const item of ST.catalog.ITEMS) {
+    const src = ST.catalog.logoPath(item);
+    if (!item.logo) {
+      assert.equal(src, null);
+      continue;
+    }
+    assert.match(item.logo, /^(?:[a-z0-9-]+:[a-z0-9-]+|wikimedia:[\w.()+-]+\.svg)$/, `bad logo source for ${item.id}`);
+    assert.equal(src, `icons/brands/${item.id}.svg`);
+    expected.add(`${item.id}.svg`);
+  }
+  assert.deepEqual([...files].sort(), [...expected].sort(), 'run npm run logos');
+  for (const f of files) {
+    const svg = await readFile(new URL(f, dir), 'utf8');
+    assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"[^>]*\sviewBox="[\d.\- ]+"/, f);
+    assert.doesNotMatch(svg, /<script|<foreignObject|\son\w+\s*=|javascript:|(?:href|src)\s*=\s*["'](?!#)/i, f);
+  }
 });
 
 test('reminders.due respects reminder window and dedup', () => {
