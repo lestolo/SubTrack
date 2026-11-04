@@ -8,10 +8,11 @@ covered by the MIT License of SubTrack.**
   their respective owners. They are used only to identify the services a user
   subscribes to. Their use does not imply any affiliation with or endorsement by
   the owners.
-- The files were taken unmodified (apart from wrapping them in an `<svg>` root)
-  from the icon collections below, distributed through
-  [Iconify](https://iconify.design). The licence of each collection covers the
-  drawing of the icon, not the trademark it depicts.
+- The files come from the icon collections below, distributed through
+  [Iconify](https://iconify.design) (taken unmodified, apart from wrapping them
+  in an `<svg>` root), and from [Wikimedia Commons](https://commons.wikimedia.org)
+  (optimised with svgo, drawing unchanged). The licence of each source covers
+  the drawing of the logo, not the trademark it depicts.
 - If you own one of these trademarks and want its logo removed, please
   [open an issue](https://github.com/lestolo/SubTrack/issues): it will be removed
   and the app will show a coloured monogram instead.
@@ -23,6 +24,7 @@ covered by the MIT License of SubTrack.**
 | `logos` | [Gil Barbara](https://github.com/gilbarbara/logos) | [CC0](https://raw.githubusercontent.com/gilbarbara/logos/master/LICENSE.txt) | `@iconify-json/logos@1.2.19` |
 | `selfhst` | [selfh.st](https://github.com/selfhst/icons) | [CC BY 4.0](https://github.com/selfhst/icons/blob/main/LICENSE) | `@iconify-json/selfhst@1.2.27` |
 | `thesvg-color` | [thesvg.org](https://github.com/glincker/thesvg) | [MIT](https://github.com/glincker/thesvg/blob/main/LICENSE) | `@iconify-json/thesvg-color@1.2.24` |
+| `wikimedia` | [Wikimedia Commons](https://commons.wikimedia.org) | Free licence or public domain: see each file page below | Downloaded, optimised with svgo |
 
 ## Files
 
@@ -39,6 +41,7 @@ covered by the MIT License of SubTrack.**
 | Babbel | `babbel.svg` | `thesvg-color:babbel` |
 | Bitwarden | `bitwarden.svg` | `thesvg-color:bitwarden` |
 | Box | `box.svg` | `thesvg-color:box` |
+| Calm | `calm.svg` | [Commons: Calm_(company)_logo.svg](https://commons.wikimedia.org/wiki/File:Calm_(company)_logo.svg) |
 | Canva | `canva.svg` | `thesvg-color:canva` |
 | ChatGPT | `chatgpt.svg` | `thesvg-color:openai-chatgpt` |
 | Claude | `claude.svg` | `selfhst:claude` |
@@ -73,6 +76,8 @@ covered by the MIT License of SubTrack.**
 | JetBrains | `jetbrains.svg` | `thesvg-color:jetbrains` |
 | Kindle Unlimited | `kindleunlimited.svg` | `thesvg-color:amazon-kindle` |
 | LinkedIn Premium | `linkedinpremium.svg` | `selfhst:linkedin` |
+| MasterClass | `masterclass.svg` | [Commons: Masterclass_logo.svg](https://commons.wikimedia.org/wiki/File:Masterclass_logo.svg) |
+| Mediaset Infinity+ | `mediasetinfinity.svg` | [Commons: Infinity+_logo_(2023).svg](https://commons.wikimedia.org/wiki/File:Infinity%2B_logo_(2023).svg) |
 | Medium | `medium.svg` | `logos:medium-icon` |
 | MEGA | `mega.svg` | `thesvg-color:mega` |
 | Microsoft 365 | `microsoft365.svg` | `selfhst:microsoft-365` |
@@ -120,6 +125,7 @@ covered by the MIT License of SubTrack.**
 | Udemy | `udemy.svg` | `logos:udemy-icon` |
 | Vimeo | `vimeo.svg` | `thesvg-color:vimeo` |
 | Vodafone | `vodafone.svg` | `thesvg-color:vodafone` |
+| WINDTRE | `windtre.svg` | [Commons: Wind_Tre_logo_2020.svg](https://commons.wikimedia.org/wiki/File:Wind_Tre_logo_2020.svg) |
 | Wix | `wix.svg` | `logos:wix` |
 | WordPress.com | `wordpress.svg` | `selfhst:wordpress` |
 | X Premium | `xpremium.svg` | `selfhst:x` |

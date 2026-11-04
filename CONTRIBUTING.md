@@ -35,7 +35,7 @@ Edit `RAW` in `js/core/catalog.js`: `[id, name, category, brandColor, logoSource
 
 - `id`: lowercase letters and digits only, unique (it is also the logo's file name).
 - `brandColor`: hex without `#`.
-- `logoSource`: a full-colour logo from [Iconify](https://icon-sets.iconify.design) as `'set:icon'`, from the `thesvg-color`, `selfhst` or `logos` sets (prefer the square symbol or app icon over a wide wordmark). Run `npm run logos` to bundle it in `icons/brands/` and update `NOTICE.md`, and commit both. Use `null` if no logo is available: a monogram is shown.
+- `logoSource`: a full-colour logo from [Iconify](https://icon-sets.iconify.design) as `'set:icon'`, from the `thesvg-color`, `selfhst` or `logos` sets, or a vector (not raster-embedded) file from Wikimedia Commons as `'wikimedia:File_name.svg'` (prefer the square symbol or app icon over a wide wordmark). Run `npm run logos` to bundle it in `icons/brands/` and update `NOTICE.md`, and commit both. Use `null` if no logo is available: a monogram is shown.
 - Please don't add prices: they change too often and differ by country.
 
 ## Reporting bugs

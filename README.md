@@ -165,7 +165,7 @@ npm test             # runs the unit tests (no install needed)
 npm start            # local dev server
 ```
 
-**Adding a service to the catalogue:** add a line to `RAW` in [`js/core/catalog.js`](js/core/catalog.js). Find the brand's full-colour logo on [icon-sets.iconify.design](https://icon-sets.iconify.design) in the *theSVG Color*, *selfh.st* or *SVG Logos* sets, set it as `'set:icon'` (e.g. `'thesvg-color:netflix'`) and run `npm run logos` to bundle it in `icons/brands/`. Otherwise use `null` and a monogram is shown.
+**Adding a service to the catalogue:** add a line to `RAW` in [`js/core/catalog.js`](js/core/catalog.js). Find the brand's full-colour logo on [icon-sets.iconify.design](https://icon-sets.iconify.design) in the *theSVG Color*, *selfh.st* or *SVG Logos* sets, set it as `'set:icon'` (e.g. `'thesvg-color:netflix'`), or use a vector file from [Wikimedia Commons](https://commons.wikimedia.org) as `'wikimedia:File_name.svg'`, and run `npm run logos` to bundle it in `icons/brands/`. Otherwise use `null` and a monogram is shown.
 
 **Adding a language:** copy the `en` block in [`js/core/i18n.js`](js/core/i18n.js), translate it and add the code to `LANGS`. A test checks that all languages have the same keys.
 
@@ -177,7 +177,7 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and ou
 
 ## Credits and trademarks
 
-- Brand logos come from the [theSVG](https://thesvg.org) (MIT), [selfh.st/icons](https://selfh.st/icons) (CC BY 4.0) and [SVG Logos](https://svgporn.com) (CC0-1.0) collections, via [Iconify](https://iconify.design). The full list with the source of each file is in [`icons/brands/NOTICE.md`](icons/brands/NOTICE.md).
+- Brand logos come from the [theSVG](https://thesvg.org) (MIT), [selfh.st/icons](https://selfh.st/icons) (CC BY 4.0) and [SVG Logos](https://svgporn.com) (CC0-1.0) collections, via [Iconify](https://iconify.design), and from [Wikimedia Commons](https://commons.wikimedia.org). The full list with the source of each file is in [`icons/brands/NOTICE.md`](icons/brands/NOTICE.md).
 - All product names, logos and brands are property of their respective owners. They are used here only to identify services, and their use does not imply endorsement. Services without an available logo are shown as a coloured monogram. If you own a trademark and want its logo removed, please open an issue.
 - SubTrack is an independent project and is not affiliated with any of the listed services.
 

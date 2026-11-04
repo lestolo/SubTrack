@@ -101,7 +101,7 @@ npm test             # esegue i test (non serve installare nulla)
 npm start            # server di sviluppo locale
 ```
 
-**Aggiungere un servizio al catalogo:** aggiungi una riga a `RAW` in [`js/core/catalog.js`](js/core/catalog.js). Cerca il logo a colori del marchio su [icon-sets.iconify.design](https://icon-sets.iconify.design) nei set *theSVG Color*, *selfh.st* o *SVG Logos*, indicalo come `'set:icona'` (ad esempio `'thesvg-color:netflix'`) ed esegui `npm run logos` per includerlo in `icons/brands/`. Altrimenti usa `null` e verrà mostrato un monogramma.
+**Aggiungere un servizio al catalogo:** aggiungi una riga a `RAW` in [`js/core/catalog.js`](js/core/catalog.js). Cerca il logo a colori del marchio su [icon-sets.iconify.design](https://icon-sets.iconify.design) nei set *theSVG Color*, *selfh.st* o *SVG Logos*, indicalo come `'set:icona'` (ad esempio `'thesvg-color:netflix'`), oppure usa un file vettoriale di [Wikimedia Commons](https://commons.wikimedia.org) come `'wikimedia:Nome_file.svg'`, ed esegui `npm run logos` per includerlo in `icons/brands/`. Altrimenti usa `null` e verrà mostrato un monogramma.
 
 **Aggiungere una lingua:** copia il blocco `en` in [`js/core/i18n.js`](js/core/i18n.js), traducilo e aggiungi il codice a `LANGS`. Un test verifica che tutte le lingue abbiano le stesse chiavi.
 
@@ -113,7 +113,7 @@ I contributi sono benvenuti. Leggi [CONTRIBUTING.md](CONTRIBUTING.md) e il [Codi
 
 ## Crediti e marchi
 
-- I loghi dei marchi provengono dalle raccolte [theSVG](https://thesvg.org) (MIT), [selfh.st/icons](https://selfh.st/icons) (CC BY 4.0) e [SVG Logos](https://svgporn.com) (CC0-1.0), tramite [Iconify](https://iconify.design). L'elenco completo con la fonte di ogni file è in [`icons/brands/NOTICE.md`](icons/brands/NOTICE.md).
+- I loghi dei marchi provengono dalle raccolte [theSVG](https://thesvg.org) (MIT), [selfh.st/icons](https://selfh.st/icons) (CC BY 4.0) e [SVG Logos](https://svgporn.com) (CC0-1.0), tramite [Iconify](https://iconify.design), e da [Wikimedia Commons](https://commons.wikimedia.org). L'elenco completo con la fonte di ogni file è in [`icons/brands/NOTICE.md`](icons/brands/NOTICE.md).
 - Tutti i nomi di prodotti, loghi e marchi appartengono ai rispettivi proprietari. Sono usati solo per identificare i servizi, e il loro uso non implica alcuna approvazione. I servizi senza un logo disponibile sono mostrati come monogramma colorato. Se sei titolare di un marchio e vuoi che il suo logo venga rimosso, apri una issue.
 - SubTrack è un progetto indipendente e non è affiliato a nessuno dei servizi elencati.
 

@@ -4,18 +4,24 @@
  *
  * Usage:
  *   npm run logos
- * which runs:
- *   npm install --no-save @iconify-json/thesvg-color @iconify-json/selfhst @iconify-json/logos
- *   node tools/build-logos.mjs
+ * which installs the icon sets and svgo without saving them, then runs this
+ * script.
  *
- * Each catalogue entry names its logo as "<set>:<icon>", e.g.
- * "thesvg-color:netflix". Only the JSON data of the icon sets is read; no
- * third-party code is executed. Every logo is bundled locally, so the app keeps
- * working offline and makes no network requests.
+ * Each catalogue entry names its logo source as either:
+ * - "<set>:<icon>", e.g. "thesvg-color:netflix": an icon of an Iconify set
+ *   (only the set's JSON data is read);
+ * - "wikimedia:<file name>", e.g. "wikimedia:Calm_(company)_logo.svg": a file
+ *   on Wikimedia Commons, which only hosts freely licensed or public-domain
+ *   files. It is downloaded once (cached in node_modules/.cache) and optimised
+ *   with svgo.
+ * Every logo is bundled locally, so the app keeps working offline and makes no
+ * network requests.
  */
 import { readFile, writeFile, readdir, mkdir, unlink } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { optimize } from 'svgo';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = path.join(root, 'icons', 'brands');
@@ -53,6 +59,42 @@ function resolve(data, name) {
   return null;
 }
 
+const COMMONS = 'https://commons.wikimedia.org/wiki/File:';
+const cacheDir = path.join(root, 'node_modules', '.cache', 'subtrack-logos');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** Downloads a Wikimedia Commons file (cached), retrying when rate-limited. */
+async function fetchCommons(file) {
+  const cached = path.join(cacheDir, file);
+  try {
+    return await readFile(cached, 'utf8');
+  } catch { /* not cached yet */ }
+  const md5 = createHash('md5').update(file).digest('hex');
+  const url = `https://upload.wikimedia.org/wikipedia/commons/${md5[0]}/${md5.slice(0, 2)}/${encodeURIComponent(file)}`;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const res = await fetch(url, { headers: { 'User-Agent': 'SubTrack-build-logos/1.0 (https://github.com/lestolo/SubTrack)' } });
+    if (res.status === 429) {
+      await sleep(5000 * 2 ** attempt);
+      continue;
+    }
+    if (!res.ok) throw new Error(`${file}: HTTP ${res.status} from ${url}`);
+    const text = await res.text();
+    await mkdir(cacheDir, { recursive: true });
+    await writeFile(cached, text);
+    return text;
+  }
+  throw new Error(`${file}: still rate-limited by Wikimedia, try again later`);
+}
+
+function cleanSvg(raw, id) {
+  const { data } = optimize(raw, {
+    multipass: true,
+    plugins: ['preset-default', 'removeDimensions', 'removeXlink', { name: 'prefixIds', params: { prefix: id } }],
+  });
+  if (!/^<svg[^>]*\sviewBox="/.test(data)) throw new Error(`${id}: logo has no viewBox`);
+  return `${data}\n`;
+}
+
 // Logos are shown with <img>, where SVG scripts never run, but reject anything
 // active or external anyway so the files are safe to open on their own too.
 const UNSAFE = /<script|<foreignObject|<iframe|<image|\son\w+\s*=|javascript:|(?:href|src)\s*=\s*["'](?!#)|url\(\s*["']?(?!#)/i;
@@ -63,6 +105,12 @@ for (const item of ITEMS) {
   if (!item.logo) continue;
   const [prefix, name, extra] = item.logo.split(':');
   if (!prefix || !name || extra !== undefined) throw new Error(`${item.id}: invalid logo source "${item.logo}"`);
+  if (prefix === 'wikimedia') {
+    const svg = cleanSvg(await fetchCommons(name), item.id);
+    if (UNSAFE.test(svg)) throw new Error(`${item.id}: unsafe content in ${item.logo}`);
+    files.set(`${item.id}.svg`, { svg, item, prefix, name });
+    continue;
+  }
   const set = await loadSet(prefix);
   const icon = resolve(set.data, name);
   if (!icon) {
@@ -97,9 +145,14 @@ const setRows = [...sets].sort(([a], [b]) => a.localeCompare(b)).map(([prefix, s
   const license = s.info.license || {};
   return `| \`${prefix}\` | [${author.name || prefix}](${author.url || ''}) | [${license.title || license.spdx}](${license.url || ''}) | \`@iconify-json/${prefix}@${s.version}\` |`;
 });
+if ([...files.values()].some((f) => f.prefix === 'wikimedia')) {
+  setRows.push('| `wikimedia` | [Wikimedia Commons](https://commons.wikimedia.org) | Free licence or public domain: see each file page below | Downloaded, optimised with svgo |');
+}
 const logoRows = [...files.values()]
   .sort((a, b) => a.item.name.localeCompare(b.item.name, 'en'))
-  .map(({ item, prefix, name }) => `| ${item.name} | \`${item.id}.svg\` | \`${prefix}:${name}\` |`);
+  .map(({ item, prefix, name }) => `| ${item.name} | \`${item.id}.svg\` | ${prefix === 'wikimedia'
+    ? `[Commons: ${name}](${COMMONS}${encodeURIComponent(name)})`
+    : `\`${prefix}:${name}\``} |`);
 
 const notice = `<!-- GENERATED FILE - do not edit by hand. Run: npm run logos -->
 # Brand logos
@@ -111,10 +164,11 @@ covered by the MIT License of SubTrack.**
   their respective owners. They are used only to identify the services a user
   subscribes to. Their use does not imply any affiliation with or endorsement by
   the owners.
-- The files were taken unmodified (apart from wrapping them in an \`<svg>\` root)
-  from the icon collections below, distributed through
-  [Iconify](https://iconify.design). The licence of each collection covers the
-  drawing of the icon, not the trademark it depicts.
+- The files come from the icon collections below, distributed through
+  [Iconify](https://iconify.design) (taken unmodified, apart from wrapping them
+  in an \`<svg>\` root), and from [Wikimedia Commons](https://commons.wikimedia.org)
+  (optimised with svgo, drawing unchanged). The licence of each source covers
+  the drawing of the logo, not the trademark it depicts.
 - If you own one of these trademarks and want its logo removed, please
   [open an issue](https://github.com/lestolo/SubTrack/issues): it will be removed
   and the app will show a coloured monogram instead.
@@ -132,4 +186,4 @@ ${setRows.join('\n')}
 ${logoRows.join('\n')}
 `;
 await writeFile(path.join(outDir, 'NOTICE.md'), notice);
-console.log(`Wrote ${files.size} logos from ${sets.size} sets.`);
+console.log(`Wrote ${files.size} logos.`);

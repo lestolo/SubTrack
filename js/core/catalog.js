@@ -3,8 +3,9 @@
  *
  * Each entry: [id, name, category, brandColor, logoSource | null]
  * - brandColor is a hex string without "#".
- * - logoSource is "<iconify-set>:<icon-name>": `npm run logos` copies that
- *   full-colour logo to icons/brands/<id>.svg (see tools/build-logos.mjs).
+ * - logoSource is "<iconify-set>:<icon-name>" or "wikimedia:<Commons file>":
+ *   `npm run logos` copies that full-colour logo to icons/brands/<id>.svg
+ *   (see tools/build-logos.mjs).
  *   When it is null (no logo available) the UI shows a monogram tile in the
  *   brand colour instead.
  *
@@ -36,7 +37,7 @@
     ['crunchyroll', 'Crunchyroll', 'video', 'FF5E00', 'thesvg-color:crunchyroll'],
     ['mubi', 'MUBI', 'video', '000000', 'thesvg-color:mubi'],
     ['timvision', 'TIMVISION', 'video', '0033A0', null],
-    ['mediasetinfinity', 'Mediaset Infinity+', 'video', '1A1A6E', null],
+    ['mediasetinfinity', 'Mediaset Infinity+', 'video', '1A1A6E', 'wikimedia:Infinity+_logo_(2023).svg'],
     ['rakutentv', 'Rakuten TV', 'video', 'BF0000', 'thesvg-color:rakuten'],
     ['discoveryplus', 'discovery+', 'video', '2175D9', null],
 
@@ -138,7 +139,7 @@
     ['peloton', 'Peloton', 'fitness', '181A1D', 'thesvg-color:peloton'],
     ['fitbit', 'Fitbit Premium', 'fitness', '00B0B9', 'thesvg-color:fitbit'],
     ['headspace', 'Headspace', 'fitness', 'F47D31', 'thesvg-color:headspace'],
-    ['calm', 'Calm', 'fitness', '4A6CF7', null],
+    ['calm', 'Calm', 'fitness', '4A6CF7', 'wikimedia:Calm_(company)_logo.svg'],
 
     // Education
     ['duolingo', 'Duolingo Super', 'education', '58CC02', 'selfhst:duolingo'],
@@ -146,13 +147,13 @@
     ['coursera', 'Coursera Plus', 'education', '0056D2', 'selfhst:coursera'],
     ['udemy', 'Udemy', 'education', 'A435F0', 'logos:udemy-icon'],
     ['skillshare', 'Skillshare', 'education', '00FF84', 'thesvg-color:skillshare'],
-    ['masterclass', 'MasterClass', 'education', '000000', null],
+    ['masterclass', 'MasterClass', 'education', '000000', 'wikimedia:Masterclass_logo.svg'],
     ['domestika', 'Domestika', 'education', 'E8336D', null],
 
     // Telco (Italy-first, generic elsewhere)
     ['tim', 'TIM', 'telco', '004691', null],
     ['vodafone', 'Vodafone', 'telco', 'E60000', 'thesvg-color:vodafone'],
-    ['windtre', 'WINDTRE', 'telco', 'FF6A00', null],
+    ['windtre', 'WINDTRE', 'telco', 'FF6A00', 'wikimedia:Wind_Tre_logo_2020.svg'],
     ['iliad', 'iliad', 'telco', 'E2001A', null],
     ['fastweb', 'Fastweb', 'telco', 'FDC300', null],
     ['homobile', 'ho. Mobile', 'telco', '00B2A9', null],

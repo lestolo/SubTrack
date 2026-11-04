@@ -43,14 +43,14 @@ test('bundled brand logos match the catalogue and are inert', async () => {
       assert.equal(src, null);
       continue;
     }
-    assert.match(item.logo, /^[a-z0-9-]+:[a-z0-9-]+$/, `bad logo source for ${item.id}`);
+    assert.match(item.logo, /^(?:[a-z0-9-]+:[a-z0-9-]+|wikimedia:[\w.()+-]+\.svg)$/, `bad logo source for ${item.id}`);
     assert.equal(src, `icons/brands/${item.id}.svg`);
     expected.add(`${item.id}.svg`);
   }
   assert.deepEqual([...files].sort(), [...expected].sort(), 'run npm run logos');
   for (const f of files) {
     const svg = await readFile(new URL(f, dir), 'utf8');
-    assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"[^>]* viewBox="[\d.\- ]+">/, f);
+    assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"[^>]*\sviewBox="[\d.\- ]+"/, f);
     assert.doesNotMatch(svg, /<script|<foreignObject|\son\w+\s*=|javascript:|(?:href|src)\s*=\s*["'](?!#)/i, f);
   }
 });

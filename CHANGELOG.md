@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- The catalogue now shows the brands' real full-colour logos on a white tile, like app icons, instead of single-colour glyphs. 99 of 118 services have a logo, including Amazon Prime, Disney+, Microsoft 365, OneDrive, Adobe Creative Cloud, ChatGPT, Canva, Slack, LinkedIn, Xbox Game Pass and Nintendo Switch Online, which were monograms before. Services without an available logo keep the coloured monogram.
-- Logos are bundled in `icons/brands/` and cached for offline use, so the app still makes no network requests. They are not covered by the MIT License: see `icons/brands/NOTICE.md`.
+- The catalogue now shows the brands' real full-colour logos on a white tile, like app icons, instead of single-colour glyphs. 103 of 118 services have a logo, including Amazon Prime, Disney+, Microsoft 365, OneDrive, Adobe Creative Cloud, ChatGPT, Canva, Slack, LinkedIn, Xbox Game Pass, Nintendo Switch Online, Mediaset Infinity+, WINDTRE, Calm and MasterClass, which were monograms before. Services without an available logo keep the coloured monogram.
+- Logos come from Iconify icon sets and Wikimedia Commons, and are bundled in `icons/brands/` and cached for offline use, so the app still makes no network requests. They are not covered by the MIT License: see `icons/brands/NOTICE.md`.
 - `npm run icons` and `js/core/icons.js` are replaced by `npm run logos` (`tools/build-logos.mjs`).
 
 ## [1.1.1] - 2026-10-04
