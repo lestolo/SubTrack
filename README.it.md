@@ -34,6 +34,11 @@
 - **Backup**: export e import dei dati in JSON. L'eliminazione si può annullare.
 - **Zero dipendenze, zero build**: HTML, CSS e JavaScript puri.
 
+<div align="center">
+<img src="docs/screenshots/it/form.png" alt="Modulo nuovo abbonamento" width="240">
+<img src="docs/screenshots/it/settings.png" alt="Impostazioni" width="240">
+</div>
+
 ## Avvio rapido
 
 Serve un qualsiasi web server statico. Per lo sviluppo locale: [Node.js](https://nodejs.org) ≥ 20 (facoltativo, solo per il server di sviluppo e i test).
